@@ -1,5 +1,6 @@
 %% question 1: estimate left and drage over a cylinder.
 
+tic
 
 %{
 
@@ -23,10 +24,10 @@ circle.
 
 d = 1 ; % daiameter [m]
 roh_inf = 1.255 ; % free-stream density [kg/m^3]
-p_inf = 101.3*10^3 ; % dynamic pressure [Pa]
+p_inf = 101.3*10^3 ; % static pressure [Pa]
 V_inf = 30 ; % free-stream velocity [m/s]
-
-
+q_inf = 1/2 * roh_inf * V_inf^2 ; % dynamic pressure [Pa]
+c = d ; % chord length here = diameter [m].
 
 
 %% solve: analytical
@@ -45,13 +46,13 @@ syms th
 %%
 
 Cp = 1 - 4*(sin(th)^2);
-Lift = Cp * sin(th);
-Drag = Cp * cos(th);
+LiftCoeff = Cp * sin(th);
+DragCoeff = Cp * cos(th);
 
 
 % integrate symbolically:
-Analytical_int_Cl = (d/2)*(int(Lift,[0 2*pi]));
-Analytical_int_Cd = (d/2)*(int(Drag,[0 2*pi]));
+Analytical_int_Cl = (1/c)*(d/2)*(int(LiftCoeff,[0 2*pi])); % this 1/c in the beggining is important to make the resultant non-dimensional.
+Analytical_int_Cd = (1/c)*(d/2)*(int(Drag,[0 2*pi]));
 
 
 % this analytical sloution can be used to quantify the error.
@@ -60,8 +61,8 @@ Analytical_int_Cd = (d/2)*(int(Drag,[0 2*pi]));
 %% solve: numerical
 
 % using Simpson's rule.
-Numerical_int_Cl = (d/2)*SimpsonsLine(Lift,10,0,2*pi);
-Numerical_int_Cd = (d/2)*SimpsonsLine(Drag,10,0,2*pi);
+Numerical_int_Cl = (1/c)*(d/2)*SimpsonsLine(LiftCoeff,10,0,2*pi);
+Numerical_int_Cd = (1/c)*(d/2)*SimpsonsLine(Drag,10,0,2*pi);
 
 % d/2 is raduis, pulled out of series because it's constant.
 
@@ -75,7 +76,7 @@ Numerical_L = Numerical_int_Cl * (1/2) * roh_inf * V_inf^2 * (pi*(d/2)^2) ;
 
 for i = 1:30
     
-Numerical_int_Cl_Different_N(i) = (d/2)*SimpsonsLine(Lift,i,0,2*pi);
+Numerical_int_Cl_Different_N(i) = (d/2)*SimpsonsLine(LiftCoeff,i,0,2*pi);
 Numerical_int_Cd_Different_N(i) = (d/2)*SimpsonsLine(Drag,i,0,2*pi);
 Different_N(i) = i;
     
@@ -100,4 +101,5 @@ xlabel('Number of panels');
 ylabel('Lift [N]')
 grid minor
 
+toc
 %%

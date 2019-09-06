@@ -29,7 +29,7 @@ y = fnval(f, x); % evaluate the function along that segment
 % apply integration
 int = 0;
 
-for k = 1:N
+for k = 1:(N-1)
     
     series = ( x(k+1) - x(k) ) * (y(k+1) + y(k))/2 ;
     

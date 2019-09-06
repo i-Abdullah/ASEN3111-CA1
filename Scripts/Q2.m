@@ -32,9 +32,12 @@ Cp_lower = Spline.Cp_lower;
 % using equation 1.15, 1.16 from Anderson's Fundemental of aerodynamics,
 % page 26 in 6th edition:
 
-% TrapezoidalRule will give out results from definite integral
+% TrapezoidalRule will give out results from definite integral, there's no
+% need to concern ourselves with skin friction pressure for now.
 
-TrapezoidalRule(Cp_upper,0,c,100)
+numSeg = 100; % how many panels used to integrate?
+
+Cn = (1/c) * ( TrapezoidalRule(Cp_upper,0,c,numSeg) - TrapezoidalRule(Cp_lower,0,c,numSeg) ) ;
 
 
 %% 
