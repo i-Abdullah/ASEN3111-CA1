@@ -24,7 +24,13 @@ function [ int ] = TrapezoidalRule(f,a,b,N)
 %   -CU Boulder, Fall 2019, ASEN 3111.
 
 x = linspace(a,b,N); % create segments that we will integrate along
-y = fnval(f, x); % evaluate the function along that segment
+ y = fnval(f, x); % evaluate the function along that segment
+
+
+% this's just to test numerical integration with symbolic function
+% y = subs(f, x);
+% ommit if not used
+
 
 % apply integration
 int = 0;

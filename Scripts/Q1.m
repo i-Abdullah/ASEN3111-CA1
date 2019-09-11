@@ -1,6 +1,6 @@
 %% question 1: estimate left and drage over a cylinder.
 
-tic
+
 
 %{
 
@@ -19,6 +19,14 @@ directly. Cp here can represent the vector field, the surface is the
 circle.
 
 %}
+
+%% housekeeping
+
+clear
+clc
+close all
+
+tic
 
 %% define constants
 
@@ -46,40 +54,43 @@ syms th
 %%
 
 Cp = 1 - 4*(sin(th)^2);
-LiftCoeff = Cp * sin(th);
-DragCoeff = Cp * cos(th);
+Cl = Cp * sin(th);
+Cd = Cp * cos(th);
 
 
 % integrate symbolically:
-Analytical_int_Cl = (1/c)*(d/2)*(int(LiftCoeff,[0 2*pi])); % this 1/c in the beggining is important to make the resultant non-dimensional.
-Analytical_int_Cd = (1/c)*(d/2)*(int(Drag,[0 2*pi]));
+Analytical_int_Cl = (1/c)*(d/2)*(int(Cl,[0 2*pi])); % this 1/c in the beggining is important to make the resultant non-dimensional.
+Analytical_int_Cd = (1/c)*(d/2)*(int(Cd,[0 2*pi]));
 
 
 % this analytical sloution can be used to quantify the error.
 
+Analytical_L =  Analytical_int_Cl * (1/2) * roh_inf * V_inf^2 * (c);
+Analytical_D =  Analytical_int_Cd * (1/2) * roh_inf * V_inf^2 * (c);
 
 %% solve: numerical
 
+% the following is just for testing:
+
 % using Simpson's rule.
-Numerical_int_Cl = (1/c)*(d/2)*SimpsonsLine(LiftCoeff,10,0,2*pi);
-Numerical_int_Cd = (1/c)*(d/2)*SimpsonsLine(Drag,10,0,2*pi);
+Numerical_int_Cl = (1/c)*(d/2)*CompositeSimpsons(Cl,10,0,2*pi);
+Numerical_int_Cd = (1/c)*(d/2)*CompositeSimpsons(Cd,10,0,2*pi);
 
 % d/2 is raduis, pulled out of series because it's constant.
 
-%% estimate Lift and Drag
-
-Numerical_D = Numerical_int_Cd * (1/2) * roh_inf * V_inf^2 * (pi*(d/2)^2) ;
-Numerical_L = Numerical_int_Cl * (1/2) * roh_inf * V_inf^2 * (pi*(d/2)^2) ;
+% estimate Lift and Drag
+Numerical_D = Numerical_int_Cd * (1/2) * roh_inf * V_inf^2 * (c);
+Numerical_L = Numerical_int_Cl * (1/2) * roh_inf * V_inf^2 * (c);
 
 
 %% see how accurate is numerical integration:
-
-for i = 1:30
-    
-Numerical_int_Cl_Different_N(i) = (d/2)*SimpsonsLine(LiftCoeff,i,0,2*pi);
-Numerical_int_Cd_Different_N(i) = (d/2)*SimpsonsLine(Drag,i,0,2*pi);
-Different_N(i) = i;
-    
+j = 1;
+for i = 1:1:10
+   
+Numerical_int_Cl_Different_N(j) = (1/c)*(d/2)*CompositeSimpsons(Cl,i,0,2*pi);
+Numerical_int_Cd_Different_N(j) = (1/c)*(d/2)*CompositeSimpsons(Cd,i,0,2*pi);
+Different_N(j) = i; % store number of panels
+    j = j+1;
     
 end
 
@@ -100,6 +111,13 @@ plot(Different_N,Numerical_L_Different_N,'k->')
 xlabel('Number of panels');
 ylabel('Lift [N]')
 grid minor
+
+%% relative error:
+
+% relative error would be taken relative to analytical sloution.
+
+Error_L = double(abs(Numerical_L_Different_N - Analytical_L )) ;
+Error_D = double(abs(Numerical_D_Different_N - Analytical_D )) ;
 
 toc
 %%
