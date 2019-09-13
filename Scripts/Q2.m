@@ -39,7 +39,7 @@ P_inf = 101.3*10^3 ; % free-stream pressure (statics)[Pa];
 % since it's NACA 0012 %thickness is t = 12/100
 
 % In our example, M = 0; Therfore, gradient change is 0.
-t = 20/100;
+t = 12/100;
 
 % since our airfoil isn't cambered, we can say that from equations in the
 % website:
@@ -48,7 +48,7 @@ t = 20/100;
 % y location simply becomes 
 
 syms x
-yt = x (t/0.2).*c .* ( 0.2969.*sqrt(x./c) -0.1260*(x./c) - 0.3516.*(x./c).^2 + 0.2843.*(x./c).^3 - 0.1036.*(x./c).^4 ) ;
+yt = (t/0.2).*c .* ( 0.2969.*sqrt(x./c) -0.1260*(x./c) - 0.3516.*(x./c).^2 + 0.2843.*(x./c).^3 - 0.1036.*(x./c).^4 ) ;
 
 
 Yu = yt;
@@ -62,15 +62,7 @@ dYu_dx = diff(Yu);
 dYl_dx = diff(Yl);
 
 
-%%
-
-% open up the spline function
-Spline = open('Cp.mat');
-
-% get upper and lower spline data
-Cp_upper = Spline.Cp_upper;
-Cp_lower = Spline.Cp_lower;
-
+%% info
 
 % since it was given that the airfoil is at 9-degrees AOA, we know that
 % integration over the surface will give us normal and axial forces, and
@@ -83,13 +75,45 @@ Cp_lower = Spline.Cp_lower;
 % TrapezoidalRule will give out results from definite integral, there's no
 % need to concern ourselves with skin friction pressure for now.
 
-numSeg = 100; % how many panels used to integrate?
+%% integration
+
+% open up the spline function
+Spline = open('Cp.mat');
+
+% get upper and lower spline data
+Cp_upper = Spline.Cp_upper;
+Cp_lower = Spline.Cp_lower;
 
 
-Cn = (1/c) * ( TrapezoidalRule(Cp_upper,0,c,numSeg) - TrapezoidalRule(Cp_lower,0,c,numSeg) ) ;
+numSeg = 1000; % how many panels used to integrate?
+
+lower_limit = 0;
+x = linspace(lower_limit,c,numSeg); % create segments that we will integrate along
+
+
+% important: getting to Cp's must be through x/c not x !
+Cpu = fnval(Cp_upper, x./c); % evaluate the upper surface Cp's along that segment
+Cpl = fnval(Cp_lower, x./c); % evaluate the lower surface Cp's along that segment
+
+
+% since dx is fixed because points in x are equispaced, the change in y 
+
+Dyu= double(subs(Yu, x));% evaluate surface of airfoil : top
+Dyl= double(subs(Yl, x)); % height of c
+
+
+% because if we start from 0, division will be 0/0, thus NAN, eliminate
+% that
+
+
+Dyu(isnan(Dyu)) = 0;
+
+Dyl(isnan(Dyl)) = 0;
+
+Cn = (1/c) * (  TrapezoidalRule(x,Cpl,lower_limit,c,numSeg,'Cn',0) - TrapezoidalRule(x,Cpu,lower_limit,c,numSeg,'Cn',0)  ) ;
 
 % for Ca
-Ca = (1/c) * ( TrapezoidalRule(Cp_upper,0,c,numSeg) - TrapezoidalRule(Cp_lower,0,c,numSeg) ) ;
+Ca = (1/c) * ( TrapezoidalRule(x,Cpu,lower_limit,c,numSeg,'Ca',Dyu) - TrapezoidalRule(x,Cpl,lower_limit,c,numSeg,'Ca',Dyl) ) ;
 
 
 Cl = Cn*cosd(alpha) - Ca*sind(alpha);

@@ -7,8 +7,8 @@ Assignment 1 (CA 1), you can find the deliverables in the folder /info.
 This script will use other routines in the folder Scripts/
 
 
-Author: Abdulla Al Ameri
-Collaborators:
+Author: Abdulla Al Ameri 
+Collaborators: Brendan Palmer, Abdullah Almugairin
 Date: Sept, 2nd, 2019.
 
 %}
