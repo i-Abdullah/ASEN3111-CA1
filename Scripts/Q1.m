@@ -99,6 +99,7 @@ Numerical_L_Different_N = Numerical_int_Cl_Different_N .* (1/2) * roh_inf * V_in
 
 
 
+figure(1)
 subplot(2,1,1)
 plot(Different_N,Numerical_D_Different_N,'r-*')
 xlabel('Number of panels');
@@ -119,5 +120,48 @@ grid minor
 Error_L = double(abs(Numerical_L_Different_N - Analytical_L )) ;
 Error_D = double(abs(Numerical_D_Different_N - Analytical_D )) ;
 
+%% determine number of panels needed:
+
+Tolerance = 0.001; % tolerance we need to be within;
+
+Condition_Error_D = find(diff(Error_D<Tolerance)==1);
+
+if isempty(Condition_Error_D) == 1    
+    % if it converges immeaditly then pick number of panels == 1;
+    Condition_Error_D = 1;
+else
+    % if it doesn't, see where it does.
+    Condition_Error_D = Condition_Error_D(end);
+end
+
+
+% check when lift converges
+
+
+Condition_Error_L = find(diff(Error_L<Tolerance)==1);
+
+if isempty(Condition_Error_L) == 1 
+    Condition_Error_L = 1;
+    
+else
+    Condition_Error_L = Condition_Error_L(end);
+end
+
+
+
+%% ptrinout results
+
+fprintf('-=-=-=-=-=-=( Question 1 ) -=-=-=-=-=-=-=-=-=-=-=-');
+fprintf('\n \n')
+
 toc
-%%
+
+% Printout results
+fprintf(['Number of panels for Drag to be within ' num2str(Tolerance) 'N is: ' num2str(Different_N(Condition_Error_D))]);
+fprintf('\n')
+
+fprintf(['Number of panels for Lift to be within ' num2str(Tolerance) 'N is: ' num2str(Different_N(Condition_Error_L))]);
+fprintf('\n \n')
+
+fprintf('-=-=-=-=-=-=( END ) -=-=-=-=-=-=-=-=-=-=-=-');
+fprintf('\n \n \n')

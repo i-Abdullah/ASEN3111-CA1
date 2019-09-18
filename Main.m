@@ -8,12 +8,13 @@ This script will use other routines in the folder Scripts/
 
 
 Author: Abdulla Al Ameri 
-Collaborators: Brendan Palmer, Abdullah Almugairin
+Collaborators: Brendan Palmer, Abdullah Almugairin, Samuel D'Souza
 Date: Sept, 2nd, 2019.
 
 %}
 
 %% house keeping
+
 
 clear
 clc
@@ -31,5 +32,12 @@ addpath('./Scripts');
 % call scripts related to question 1
 
 run('Q1.m');
+
+
+%% question 2:
+% call scripts related to question 2
+
+run('Q2.m');
+
 
 %%

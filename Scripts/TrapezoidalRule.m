@@ -58,7 +58,7 @@ elseif mode == "Ca" || mode == "ca"
     
 for k = 1:(N-1)
     
-    series = (( x(k+1) - x(k) ) * (y(k+1) + y(k))/2) * (-( Dy(k+1) - Dy(k) ) / ( x(k+1) - x(k) )) ;
+    series = (( x(k+1) - x(k) ) * (y(k+1) + y(k))/2) * (-( Dy(k) - Dy(k+1) ) / ( x(k+1) - x(k) )) ;
     
     int = int + series; % store results.
     

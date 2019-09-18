@@ -4,8 +4,15 @@
 % surface estimate lift and drag using numerical integraiton,
 % mainly Trapazoidal rule
 
+%% housekeeping
+
+clear
+
+
 
 %% define ocnstants
+
+tic
 
 c = 2; % chord length [m]
 alpha = 9; % AOA [Degrees]
@@ -77,6 +84,7 @@ dYl_dx = diff(Yl);
 
 %% integration
 
+
 % open up the spline function
 Spline = open('Cp.mat');
 
@@ -119,15 +127,104 @@ Ca = (1/c) * ( TrapezoidalRule(x,Cpu,lower_limit,c,numSeg,'Ca',Dyu) - Trapezoida
 Cl = Cn*cosd(alpha) - Ca*sind(alpha);
 Cd = Cn*sind(alpha) + Ca*cosd(alpha);
 
-%% 
+% compute lift and drag
+
+L = Cl * (1/2) * roh_inf * (V_inf)^2 * c ;
+D = Cd * (1/2) * roh_inf * (V_inf)^2 * c ;
+
+%% change number of panels:
 
 
-Up = fnval(Cp_upper, [0:0.001:1]);
-Down = fnval(Cp_lower, [0:0.001:1]);
+j = 1;
 
-plot([0:0.001:1],-Up,'LineWidth',2)
+for i = 1:100
+    
+    x = linspace(lower_limit,c,i); % create segments that we will integrate along
+
+
+Cpu = fnval(Cp_upper, x./c); % evaluate the upper surface Cp's along that segment
+Cpl = fnval(Cp_lower, x./c); % evaluate the lower surface Cp's along that segment
+
+Dyu= double(subs(Yu, x));% evaluate surface of airfoil : top
+Dyl= double(subs(Yl, x)); % height of c
+
+% because if we start from 0, division will be 0/0, thus NAN, eliminate
+% that
+
+
+Dyu(isnan(Dyu)) = 0;
+
+Dyl(isnan(Dyl)) = 0;
+
+
+    
+Cn_N(j) = (1/c) * (  TrapezoidalRule(x,Cpl,lower_limit,c,i,'Cn',0) - TrapezoidalRule(x,Cpu,lower_limit,c,i,'Cn',0)  ) ;
+
+% for Ca
+Ca_N(j) = (1/c) * ( TrapezoidalRule(x,Cpu,lower_limit,c,i,'Ca',Dyu) - TrapezoidalRule(x,Cpl,lower_limit,c,i,'Ca',Dyl) ) ;
+
+
+Cl_N(j) = Cn_N(j)*cosd(alpha) - Ca_N(j)*sind(alpha);
+Cd_N(j) = Cn_N(j)*sind(alpha) + Ca_N(j)*cosd(alpha);
+
+% compute lift and drag
+
+L_N(j) = Cl_N(j) * (1/2) * roh_inf * (V_inf)^2 * c ;
+D_N(j) = Cd_N(j) * (1/2) * roh_inf * (V_inf)^2 * c ;
+Points(j) = i;
+  j = j+1;  
+end
+
+Panels = Points + 2;
+
+%% printout
+
+Tolerance1 = 5/100;
+Tolerance2 = 1/100;
+Tolerance3 = (1/10)/100;
+
+err_Cl_N = (  abs(Cl_N(2:end) - Cl_N(1:end-1) ) ./ abs(Cl_N(2:end) )) ;
+err_L_N = (  abs(L_N(2:end) - L_N(1:end-1) ) ./ abs(L_N(2:end) )) ;
+
+fprintf('-=-=-=-=-=-=( Question 2 ) -=-=-=-=-=-=-=-=-=-=-=-');
+fprintf('\n \n')
+
+toc
+
+% Printout results
+fprintf(['Number of integration points n for L to be within ' num2str(Tolerance1.*100) '%%  relative error is: ' num2str(find(err_Cl_N<Tolerance1,1))]);
+fprintf('\n')
+
+fprintf(['Number of integration points n for L to be within ' num2str(Tolerance2.*100) '%%  relative error is: ' num2str(find(err_Cl_N<Tolerance2,1))]);
+fprintf('\n')
+
+fprintf(['Number of integration points n for L to be within ' num2str(Tolerance3.*100) '%%  relative error is: ' num2str(find(err_Cl_N<Tolerance3,1))]);
+fprintf('\n')
+
+
+fprintf('\n \n')
+
+fprintf('-=-=-=-=-=-=( END ) -=-=-=-=-=-=-=-=-=-=-=-');
+fprintf('\n \n \n')
+
+
+
+%% plots:
+figure(2)
+hax=axes;
+plot(Points,L_N,'-*k','LineWidth',1);
 hold on
-plot([0:0.001:1],-Down,'LineWidth',2)
-ylabel('-C_p');
-xlabel('x/c');
+line([find(err_L_N<Tolerance1,1) find(err_L_N<Tolerance1,1)],get(hax,'YLim'),'Color','r','LineWidth',3)
+line([find(err_L_N<Tolerance2,1) find(err_L_N<Tolerance2,1)],get(hax,'YLim'),'Color','b','LineWidth',3)
+line([find(err_L_N<Tolerance3,1) find(err_L_N<Tolerance3,1)],get(hax,'YLim'),'Color','g','LineWidth',3)
+legend('Lift','5 %% error','1 %% error','0.1 %% error','Location','SouthEast')
 grid minor
+% Up = fnval(Cp_upper, [0:0.001:1]);
+% Down = fnval(Cp_lower, [0:0.001:1]);
+% 
+% plot([0:0.001:1],-Up,'LineWidth',2)
+% hold on
+% plot([0:0.001:1],-Down,'LineWidth',2)
+% ylabel('-C_p');
+% xlabel('x/c');
+% grid minor
