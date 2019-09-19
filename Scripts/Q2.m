@@ -176,7 +176,7 @@ Points(j) = i;
 end
 
 Panels = Points + 2;
-
+Points = Points .* 2;
 %% printout
 
 Tolerance1 = 5/100;
@@ -192,13 +192,13 @@ fprintf('\n \n')
 toc
 
 % Printout results
-fprintf(['Number of integration points n for L to be within ' num2str(Tolerance1.*100) '%%  relative error is: ' num2str(find(err_Cl_N<Tolerance1,1))]);
+fprintf(['Number of integration points n for L to be within ' num2str(Tolerance1.*100) '%%  relative error is: ' num2str(Points(find(err_Cl_N<Tolerance1,1)))]);
 fprintf('\n')
 
-fprintf(['Number of integration points n for L to be within ' num2str(Tolerance2.*100) '%%  relative error is: ' num2str(find(err_Cl_N<Tolerance2,1))]);
+fprintf(['Number of integration points n for L to be within ' num2str(Tolerance2.*100) '%%  relative error is: ' num2str(Points(find(err_Cl_N<Tolerance2,1)))]);
 fprintf('\n')
 
-fprintf(['Number of integration points n for L to be within ' num2str(Tolerance3.*100) '%%  relative error is: ' num2str(find(err_Cl_N<Tolerance3,1))]);
+fprintf(['Number of integration points n for L to be within ' num2str(Tolerance3.*100) '%%  relative error is: ' num2str(Points(find(err_Cl_N<Tolerance3,1)))]);
 fprintf('\n')
 
 
@@ -214,11 +214,12 @@ figure(2)
 hax=axes;
 plot(Points,L_N,'-*k','LineWidth',1);
 hold on
-line([find(err_L_N<Tolerance1,1) find(err_L_N<Tolerance1,1)],get(hax,'YLim'),'Color','r','LineWidth',3)
-line([find(err_L_N<Tolerance2,1) find(err_L_N<Tolerance2,1)],get(hax,'YLim'),'Color','b','LineWidth',3)
-line([find(err_L_N<Tolerance3,1) find(err_L_N<Tolerance3,1)],get(hax,'YLim'),'Color','g','LineWidth',3)
-legend('Lift','5 %% error','1 %% error','0.1 %% error','Location','SouthEast')
+line([Points(find(err_L_N<Tolerance1,1)) Points(find(err_L_N<Tolerance1,1))],get(hax,'YLim'),'Color','r','LineWidth',3)
+line([Points(find(err_L_N<Tolerance2,1)) Points(find(err_L_N<Tolerance2,1))],get(hax,'YLim'),'Color','b','LineWidth',3)
+line([Points(find(err_L_N<Tolerance3,1)) Points(find(err_L_N<Tolerance3,1))],get(hax,'YLim'),'Color','g','LineWidth',3)
+legend('Lift','5 % error','1 % error','0.1 % error','Location','SouthEast')
 grid minor
+
 % Up = fnval(Cp_upper, [0:0.001:1]);
 % Down = fnval(Cp_lower, [0:0.001:1]);
 % 
