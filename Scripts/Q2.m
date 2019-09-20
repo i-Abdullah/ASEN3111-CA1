@@ -137,7 +137,7 @@ L_conv = Cl_Conv * (1/2) * roh_inf * (V_inf)^2 * c ;
 
 j = 1;
 
-for i = 1:2500
+for i = 1:1000
     %i;
     x = linspace(lower_limit,c,i); % create segments that we will integrate along
 
@@ -217,8 +217,15 @@ hold on
 line([Points(find(err_L_N<Tolerance1,1)) Points(find(err_L_N<Tolerance1,1))],get(hax,'YLim'),'Color','r','LineWidth',3)
 line([Points(find(err_L_N<Tolerance2,1)) Points(find(err_L_N<Tolerance2,1))],get(hax,'YLim'),'Color','b','LineWidth',3)
 line([Points(find(err_L_N<Tolerance3,1)) Points(find(err_L_N<Tolerance3,1))],get(hax,'YLim'),'Color','g','LineWidth',3)
-legend('Lift','5% error','1% error','0.1% error','Location','SouthEast')
+x_lim = xlim; % current y-axis limits
+plot([x_lim(1) x_lim(2)],[L_conv L_conv],'--c','LineWidth',2)
+
+
+legend('Lift','5% error','1% error','0.1% error','Estimated convergance Lift','Location','SouthEast')
 grid minor
+xlabel('Number of points')
+ylabel('Lift force [N]')
+title('Number of points for Numerical integration Vs. Lift force for NACA 0012')
 
 % Up = fnval(Cp_upper, [0:0.001:1]);
 % Down = fnval(Cp_lower, [0:0.001:1]);
