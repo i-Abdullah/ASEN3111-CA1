@@ -54,19 +54,16 @@ t = 12/100;
 % since it's symmetric airfoil, we will see that everything cancels and the
 % y location simply becomes 
 
-syms x
-yt = (t/0.2).*c .* ( 0.2969.*sqrt(x./c) -0.1260*(x./c) - 0.3516.*(x./c).^2 + 0.2843.*(x./c).^3 - 0.1036.*(x./c).^4 ) ;
+yt = @(x) (t/0.2).*c .* ( 0.2969.*sqrt(x./c) -0.1260*(x./c) - 0.3516.*(x./c).^2 + 0.2843.*(x./c).^3 - 0.1036.*(x./c).^4 ) ;
 
 
 Yu = yt;
-Yl =  -1.*(t/0.2).*c .* ( 0.2969.*sqrt(x./c) -0.1260*(x./c) - 0.3516.*(x./c).^2 + 0.2843.*(x./c).^3 - 0.1036.*(x./c).^4 ) ;
+Yl = @(x) (-1)*(t/0.2).*c .* ( 0.2969.*sqrt(x./c) -0.1260*(x./c) - 0.3516.*(x./c).^2 + 0.2843.*(x./c).^3 - 0.1036.*(x./c).^4 ) ;
 
 
 % for Ca we would need to know how the lower and upper surface change
 % curvature, so we would need the derivative with respect to x.
 
-dYu_dx = diff(Yu);
-dYl_dx = diff(Yl);
 
 
 %% info
@@ -106,8 +103,8 @@ Cpl = fnval(Cp_lower, x./c); % evaluate the lower surface Cp's along that segmen
 
 % since dx is fixed because points in x are equispaced, the change in y 
 
-Dyu= double(subs(Yu, x));% evaluate surface of airfoil : top
-Dyl= double(subs(Yl, x)); % height of c
+Dyu= double(Yu(x));% evaluate surface of airfoil : top
+Dyl= double(Yl(x)); % height of c
 
 
 % because if we start from 0, division will be 0/0, thus NAN, eliminate
@@ -140,7 +137,7 @@ L_conv = Cl_Conv * (1/2) * roh_inf * (V_inf)^2 * c ;
 
 j = 1;
 
-for i = 1:2:1000
+for i = 1:2500
     %i;
     x = linspace(lower_limit,c,i); % create segments that we will integrate along
 
@@ -148,8 +145,8 @@ for i = 1:2:1000
 Cpu = fnval(Cp_upper, x./c); % evaluate the upper surface Cp's along that segment
 Cpl = fnval(Cp_lower, x./c); % evaluate the lower surface Cp's along that segment
 
-Dyu= double(subs(Yu, x));% evaluate surface of airfoil : top
-Dyl= double(subs(Yl, x)); % height of c
+Dyu= double(Yu(x));% evaluate surface of airfoil : top
+Dyl= double(Yl(x)); % height of c
 
 % because if we start from 0, division will be 0/0, thus NAN, eliminate
 % that
