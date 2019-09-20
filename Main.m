@@ -40,4 +40,19 @@ run('Q1.m');
 run('Q2.m');
 
 
-%%
+%% functions used
+%
+%
+% <include>Q1.m</include>
+%% functions used
+%
+%
+% <include>CompositeSimpsons.m</include>
+%% functions used
+%
+%
+% <include>Q2.m</include>
+%% functions used
+%
+%
+% <include>TrapezoidalRule.m</include>
