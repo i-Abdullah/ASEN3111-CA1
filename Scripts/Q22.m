@@ -140,31 +140,29 @@ L_conv = Cl_Conv * (1/2) * roh_inf * (V_inf)^2 * c ;
 
 j = 1;
 
-for i = 1:2:1000
-    %i;
-    x = linspace(lower_limit,c,i); % create segments that we will integrate along
-
-
+for i = 1000
+    
+x = linspace(lower_limit,c,i); % create segments that we will integrate along
 Cpu = fnval(Cp_upper, x./c); % evaluate the upper surface Cp's along that segment
 Cpl = fnval(Cp_lower, x./c); % evaluate the lower surface Cp's along that segment
-
 Dyu= double(subs(Yu, x));% evaluate surface of airfoil : top
 Dyl= double(subs(Yl, x)); % height of c
+
 
 % because if we start from 0, division will be 0/0, thus NAN, eliminate
 % that
 
-
 Dyu(isnan(Dyu)) = 0;
-
 Dyl(isnan(Dyl)) = 0;
 
 
+[ Cn_i Ca_i ] = TrapezoidalRule2(x,Cpu,Cpl,0,c,i,Dyu,Dyl);
+
     
-Cn_N(j) = (1/c) * (  TrapezoidalRule(x,Cpl,lower_limit,c,i,'Cn',0) - TrapezoidalRule(x,Cpu,lower_limit,c,i,'Cn',0)  ) ;
+Cn_N(j) = Cn_i;
 
 % for Ca
-Ca_N(j) = (1/c) * ( TrapezoidalRule(x,Cpu,lower_limit,c,i,'Ca',Dyu) - TrapezoidalRule(x,Cpl,lower_limit,c,i,'Ca',Dyl) ) ;
+Ca_N(j) = Ca_i;
 
 
 Cl_N(j) = Cn_N(j)*cosd(alpha) - Ca_N(j)*sind(alpha);

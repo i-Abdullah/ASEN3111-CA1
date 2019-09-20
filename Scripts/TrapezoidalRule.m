@@ -37,6 +37,7 @@ function [ int ] = TrapezoidalRule(x,y,a,b,N,mode,Dy)
 
 % apply integration
 int = 0;
+v = 1; % counting
 
 
 % if we integrating for coefficient of normal force
@@ -47,10 +48,9 @@ for k = 1:(N-1)
     
     series = ( x(k+1) - x(k) ) * (y(k+1) + y(k))/2 ;
     
-    int = int + series; % store results.
+    int(v) = series; % store results.
     
-    series = []; % empty place-holder.
-    
+    v = v+1;
 end
 
 
@@ -60,15 +60,17 @@ for k = 1:(N-1)
     
     series = (( x(k+1) - x(k) ) * (y(k+1) + y(k))/2) * (-( Dy(k) - Dy(k+1) ) / ( x(k+1) - x(k) )) ;
     
-    int = int + series; % store results.
+    int(v) = series; % store results.
     
-    series = []; % empty place-holder.
-    
-end
-
+    v = v+1;
     
 end
 
+    
+end
+
+
+int = sum(int);
 
     
     
